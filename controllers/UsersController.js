@@ -53,12 +53,12 @@ const updateUser = (req, res) => {
   const id = parseInt(req.params.id);
   console.log("🚀 - id:", id);
 
-  const { age } = req.body;
+  const { firstname, lastname, age } = req.body;
 
   database
     .query(
-      "UPDATE users SET age = ? where id = ?",
-      [age, id]
+      "UPDATE users SET firstname = ?, lastname = ?,  age = ? where id = ?",
+      [firstname, lastname, age, id]
     )
     .then(([result]) => {
       if (result.affectedRows === 0) {
