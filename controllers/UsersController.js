@@ -51,7 +51,6 @@ const postUsers = (req, res) => {
 
 const updateUser = (req, res) => {
   const id = parseInt(req.params.id);
-  console.log("🚀 - id:", id);
 
   const { firstname, lastname, age } = req.body;
 
@@ -87,7 +86,7 @@ const deleteUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error editing the user");
+      res.status(500).send("Error deleting the user");
     });
 };
 
