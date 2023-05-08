@@ -1,8 +1,35 @@
 const database = require("../db_connection");
 
 const getUsers = (req, res) => {
+  const initialSql = "SELECT * FROM users";
+
+  const where = [];
+
+  if (req.query.city != null) {
+    where.push({
+      column: "city",
+      value: req.query.city,
+      operator: "=",
+    });
+  }
+
+  if (req.query.language != null) {
+    where.push({
+      column: "language",
+      value: req.query.language,
+      operator: "=",
+    });
+  }
+
   database
-    .query("SELECT * FROM users")
+    .query(
+      where.reduce(
+        (sql, { column, operator }, index) =>
+          `${sql} ${index === 0 ? "WHERE" : "AND"} ${column} ${operator} ?`,
+        initialSql
+      ),
+      where.map(({ value }) => value)
+    )
     .then(([users]) => {
       res.status(200).json(users);
     })
@@ -48,4 +75,45 @@ const postUsers = (req, res) => {
     });
 };
 
-module.exports = { getUsers, postUsers, getUserById };
+const updateUser = (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const { firstname, lastname, age, city, language } = req.body;
+
+  database
+    .query(
+      "UPDATE users SET firstname = ?, lastname = ?,  age = ?, city = ?,  language = ? WHERE id = ?",
+      [firstname, lastname, age, city, language, id]
+    )
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not Found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error editing the user");
+    });
+};
+
+const deleteUser = (req, res) => {
+  const id = parseInt(req.params.id);
+
+  database
+    .query("DELETE FROM users WHERE id = ?", [id])
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not Found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error deleting the user");
+    });
+};
+
+module.exports = { getUsers, getUserById, postUsers, updateUser, deleteUser };
