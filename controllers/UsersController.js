@@ -1,7 +1,7 @@
 const database = require("../db_connection");
 
 const getUsers = (req, res) => {
-  const initialSql = "SELECT * from users";
+  const initialSql = "SELECT * FROM users";
 
   const where = [];
 
@@ -43,7 +43,7 @@ const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
-    .query("select * from users where id = ?", [id])
+    .query("SELECT * FROM users WHERE id = ?", [id])
     .then(([user]) => {
       if (user[0] != null) {
         res.status(200).json(user[0]);
@@ -58,14 +58,13 @@ const getUserById = (req, res) => {
 };
 
 const postUsers = (req, res) => {
-  const { firstname, lastname, age } = req.body;
+  const { firstname, lastname, age, city, language } = req.body;
 
   database
-    .query("INSERT INTO users (firstname, lastname, age) VALUES (?, ?, ?)", [
-      firstname,
-      lastname,
-      age,
-    ])
+    .query(
+      "INSERT INTO users (firstname, lastname, age, city, language) VALUES (?, ?, ?, ?, ?)",
+      [firstname, lastname, age, city, language]
+    )
     .then(([result]) => {
       console.log(result);
       res.location(`/api/users/${result.insertId}`).sendStatus(201);
@@ -79,12 +78,12 @@ const postUsers = (req, res) => {
 const updateUser = (req, res) => {
   const id = parseInt(req.params.id);
 
-  const { firstname, lastname, age } = req.body;
+  const { firstname, lastname, age, city, language } = req.body;
 
   database
     .query(
-      "UPDATE users SET firstname = ?, lastname = ?,  age = ? where id = ?",
-      [firstname, lastname, age, id]
+      "UPDATE users SET firstname = ?, lastname = ?,  age = ?, city = ?,  language = ? WHERE id = ?",
+      [firstname, lastname, age, city, language, id]
     )
     .then(([result]) => {
       if (result.affectedRows === 0) {
