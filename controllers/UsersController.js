@@ -2,7 +2,7 @@ const database = require("../db_connection");
 
 const getUsers = (req, res) => {
   database
-    .query("select * from users")
+    .query("SELECT * FROM users")
     .then(([users]) => {
       res.status(200).json(users);
     })
@@ -16,7 +16,7 @@ const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
-    .query("select * from users where id = ?", [id])
+    .query("SELECT * FROM users WHERE id = ?", [id])
     .then(([user]) => {
       if (user[0] != null) {
         res.status(200).json(user[0]);
@@ -31,14 +31,13 @@ const getUserById = (req, res) => {
 };
 
 const postUsers = (req, res) => {
-  const { firstname, lastname, age } = req.body;
+  const { firstname, lastname, age, city, language } = req.body;
 
   database
-    .query("INSERT INTO users (firstname, lastname, age) VALUES (?, ?, ?)", [
-      firstname,
-      lastname,
-      age,
-    ])
+    .query(
+      "INSERT INTO users (firstname, lastname, age, city, language) VALUES (?, ?, ?, ?, ?)",
+      [firstname, lastname, age, city, language]
+    )
     .then(([result]) => {
       console.log(result);
       res.location(`/api/users/${result.insertId}`).sendStatus(201);
